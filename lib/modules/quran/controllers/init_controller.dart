@@ -48,7 +48,7 @@ class InitController extends GetxController {
       'englishName': 'Mohamed Siddiq El-Minshawi',
       'name': 'محمد صديق المنشاوي',
       'style': 'murattal',
-      'baseUrl': 'https://server8.mp3quran.net/minsh/',
+      'baseUrl': 'https://server10.mp3quran.net/minsh/',
     },
   ];
 

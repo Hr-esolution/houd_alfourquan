@@ -24,7 +24,10 @@ class ReciterListPage extends StatelessWidget {
           decoration: BoxDecoration(
             color: DT.bg(context),
             border: Border(
-              bottom: BorderSide(color: DT.or.withValues(alpha: dark ? 0.30 : 0.20), width: 0.8),
+              bottom: BorderSide(
+                color: DT.or.withValues(alpha: dark ? 0.30 : 0.20),
+                width: 0.8,
+              ),
             ),
           ),
         ),
@@ -33,10 +36,7 @@ class ReciterListPage extends StatelessWidget {
           children: [
             Icon(Icons.person_outline, color: DT.or, size: 18),
             const SizedBox(width: 7),
-            Text(
-              'Select Reciter'.trx,
-              style: DT.titleLg(context),
-            ),
+            Text('Select Reciter'.trx, style: DT.titleLg(context)),
           ],
         ),
         centerTitle: true,
@@ -71,10 +71,7 @@ class ReciterListPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Text(
-                    'Loading reciters...',
-                    style: DT.sub(context),
-                  ),
+                  Text('Loading reciters...', style: DT.sub(context)),
                 ],
               ),
             );
@@ -83,7 +80,7 @@ class ReciterListPage extends StatelessWidget {
           return ListView.separated(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
             itemCount: controller.reciters.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            separatorBuilder: (_, _) => const SizedBox(height: 10),
             itemBuilder: (context, index) {
               final reciter = controller.reciters[index];
               final isSelected = controller.selectedReciterId == reciter.id;
@@ -114,7 +111,11 @@ class _ReciterRow extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onSelect;
 
-  const _ReciterRow({required this.reciter, required this.isSelected, required this.onSelect});
+  const _ReciterRow({
+    required this.reciter,
+    required this.isSelected,
+    required this.onSelect,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -138,11 +139,13 @@ class _ReciterRow extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     reciter.nameAr,
-                    style: DT.titleMd(context).copyWith(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: DT.subC(context),
-                    ),
+                    style: DT
+                        .titleMd(context)
+                        .copyWith(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: DT.subC(context),
+                        ),
                     textDirection: TextDirection.rtl,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

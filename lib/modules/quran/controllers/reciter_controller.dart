@@ -14,11 +14,30 @@ class ReciterController extends GetxController {
   late GetStorage _storage;
   late Dio _dio;
 
+  static const Map<String, List<String>> _baseAliases = {
+    'ar.saadalghamdi': [
+      'https://server6.mp3quran.net/ghamdi/',
+      'https://server7.mp3quran.net/s_gmd/',
+    ],
+    'ar.saadalghaamdi': [
+      'https://server6.mp3quran.net/ghamdi/',
+      'https://server7.mp3quran.net/s_gmd/',
+    ],
+    'ar.sa3d_alghaamdi': [
+      'https://server6.mp3quran.net/ghamdi/',
+      'https://server7.mp3quran.net/s_gmd/',
+    ],
+    'ar.minshawi': [
+      'https://server10.mp3quran.net/minsh/',
+    ],
+  };
+
   // Data
   List<Reciter> _reciters = [];
   List<Surah> _surahs = [];
   String _selectedReciterId = '';
   Map<String, List<int>> _downloadedSurahs = {};
+  final Map<String, String> _baseOverrides = {};
   final Map<int, double> _downloadProgress = {};
   final Map<int, bool> _isDownloading = {};
   double _totalUsedSpaceMb = 0;
@@ -71,6 +90,7 @@ class ReciterController extends GetxController {
 
     // Load reciters from cache
     _loadRecitersFromCache();
+    _loadBaseOverrides();
 
     // Load selected reciter and downloads
     _loadSelectedReciter();
@@ -102,13 +122,107 @@ class ReciterController extends GetxController {
     }
   }
 
+  void _loadBaseOverrides() {
+    try {
+      final cached = _storage.read('reciter_base_overrides');
+      if (cached != null) {
+        final Map<String, dynamic> data = Map<String, dynamic>.from(jsonDecode(cached));
+        _baseOverrides
+          ..clear()
+          ..addAll(data.map((k, v) => MapEntry(k, v.toString())));
+      }
+    } catch (e) {
+      debugPrint('Error loading reciter base overrides: $e');
+      _baseOverrides.clear();
+    }
+  }
+
+  String _normalizeBaseUrl(String baseUrl) {
+    if (baseUrl.isEmpty) return baseUrl;
+    return baseUrl.endsWith('/') ? baseUrl : '$baseUrl/';
+  }
+
+  String getResolvedBaseUrl(Reciter reciter) {
+    final override = _baseOverrides[reciter.id];
+    if (override != null && override.isNotEmpty) {
+      return _normalizeBaseUrl(override);
+    }
+    return _normalizeBaseUrl(reciter.baseUrl);
+  }
+
+  void saveResolvedBaseUrl(String reciterId, String baseUrl) {
+    if (reciterId.isEmpty || baseUrl.isEmpty) return;
+    final normalized = _normalizeBaseUrl(baseUrl);
+    _baseOverrides[reciterId] = normalized;
+    _storage.write('reciter_base_overrides', jsonEncode(_baseOverrides));
+  }
+
+  void saveResolvedBaseUrlFromUrl(String reciterId, String url) {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+    final path = uri.path;
+    final lastSlash = path.lastIndexOf('/');
+    if (lastSlash < 0) return;
+    final basePath = path.substring(0, lastSlash + 1);
+    final baseUrl = uri.replace(path: basePath, query: '').toString();
+    saveResolvedBaseUrl(reciterId, baseUrl);
+  }
+
+  List<String> buildCandidateUrls(int surahNumber) {
+    final reciter = selectedReciter;
+    if (reciter == null) return [];
+    final padded = surahNumber.toString().padLeft(3, '0');
+    final base = getResolvedBaseUrl(reciter);
+    if (base.isEmpty) return [];
+
+    final urls = <String>[];
+    final seen = <String>{};
+
+    void addBase(String candidateBase) {
+      final normalized = _normalizeBaseUrl(candidateBase);
+      final url = '${normalized}$padded.mp3';
+      if (seen.add(url)) {
+        urls.add(url);
+      }
+    }
+
+    addBase(base);
+
+    final uri = Uri.tryParse(base);
+    if (uri != null && uri.host.endsWith('mp3quran.net')) {
+      const servers = [
+        'server8',
+        'server9',
+        'server10',
+        'server11',
+        'server12',
+        'server13',
+        'server7',
+        'server6',
+      ];
+      for (final server in servers) {
+        final host = '$server.mp3quran.net';
+        if (host == uri.host) continue;
+        final candidate = uri.replace(host: host).toString();
+        addBase(candidate);
+      }
+    }
+
+    final aliases = _baseAliases[reciter.id] ?? const [];
+    for (final alias in aliases) {
+      addBase(alias);
+    }
+
+    return urls;
+  }
+
   void _loadDefaultReciters() {
     _reciters = [
       // Récitateurs les plus populaires
       Reciter(identifier: 'ar.alafasy', name: 'مشاري العفاسي', englishName: 'Mishary Alafasy', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/afs/'),
       Reciter(identifier: 'ar.sudais', name: 'عبد الرحمن السديس', englishName: 'Abdurrahman Al-Sudais', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/swd/'),
       Reciter(identifier: 'ar.husary', name: 'محمود خليل الحصري', englishName: 'Mahmoud Khalil Al-Husary', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/husr/'),
-      Reciter(identifier: 'ar.minshawi', name: 'محمد صديق المنشاوي', englishName: 'Mohamed Siddiq El-Minshawi', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/minsh/'),
+      Reciter(identifier: 'ar.minshawi', name: 'محمد صديق المنشاوي', englishName: 'Mohamed Siddiq El-Minshawi', style: 'murattal', baseUrl: 'https://server10.mp3quran.net/minsh/'),
       Reciter(identifier: 'ar.mahermuaiqly', name: 'ماهر المعيقلي', englishName: 'Maher Al-Muaiqly', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/maher/'),
       Reciter(identifier: 'ar.abdulbasitmurattal', name: 'عبد الباسط عبد الصمد', englishName: 'Abdul Basit (Murattal)', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/basit/'),
       Reciter(identifier: 'ar.saoodshuraim', name: 'سعود الشريم', englishName: 'Saud Al-Shuraim', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/shur/'),
@@ -125,7 +239,7 @@ class ReciterController extends GetxController {
       Reciter(identifier: 'ar.mohammadsaleemajid', name: 'محمد سليم', englishName: 'Mohammad Saleem', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/saleem/'),
       Reciter(identifier: 'ar.muhammadayyoub', name: 'محمد أيوب', englishName: 'Muhammad Ayyub', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/ayoub/'),
       Reciter(identifier: 'ar.muhammadjibreel', name: 'محمد جبريل', englishName: 'Muhammad Jibreel', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/jibr/'),
-      Reciter(identifier: 'ar.saadalghamdi', name: 'سعد الغامدي', englishName: 'Saad Al-Ghamdi', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/gmd/'),
+      Reciter(identifier: 'ar.saadalghamdi', name: 'سعد الغامدي', englishName: 'Saad Al-Ghamdi', style: 'murattal', baseUrl: 'https://server6.mp3quran.net/ghamdi/'),
       Reciter(identifier: 'ar.sahlalalawi', name: 'سهل الياسين', englishName: 'Sahl Al-Yassin', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/sahl/'),
       Reciter(identifier: 'ar.salahalbudeair', name: 'صلاح البدير', englishName: 'Salah Al-Budeair', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/salah/'),
       Reciter(identifier: 'ar.faresabbad', name: 'فارس عباد', englishName: 'Fares Abbad', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/abbad/'),
@@ -142,7 +256,7 @@ class ReciterController extends GetxController {
       Reciter(identifier: 'ar.hazaabalbalami', name: 'حازم الحازمي', englishName: 'Hazem Al-Hazmi', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/hazmi/'),
       Reciter(identifier: 'ar.khalidqahtani', name: 'خالد القحطاني', englishName: 'Khalid Al-Qahtani', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/qahtani/'),
       Reciter(identifier: 'ar.muhammadmuhsin', name: 'محمد محسن', englishName: 'Muhammad Muhsin', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/muhsin/'),
-      Reciter(identifier: 'ar.saadalghaamdi', name: 'سعد الغامدي', englishName: 'Saad Al-Ghamdi', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/gmd/'),
+      Reciter(identifier: 'ar.saadalghaamdi', name: 'سعد الغامدي', englishName: 'Saad Al-Ghamdi', style: 'murattal', baseUrl: 'https://server6.mp3quran.net/ghamdi/'),
       Reciter(identifier: 'ar.suoodshuraym', name: 'سعود الشريم', englishName: 'Saud Al-Shuraim', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/shur/'),
       Reciter(identifier: 'ar.yasseralkahtani', name: 'ياسر القحطاني', englishName: 'Yasser Al-Kahtani', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/kahtani/'),
       Reciter(identifier: 'ar.abdullaahkhalifa', name: 'عبد الله خليفة', englishName: 'Abdullah Khalifa', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/khalifa/'),
@@ -153,7 +267,7 @@ class ReciterController extends GetxController {
       Reciter(identifier: 'ar.mishaari', name: 'مشاري العفاسي', englishName: 'Mishary Rashid Alafasy', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/afs/'),
       Reciter(identifier: 'ar.muhammadaiyoob', name: 'محمد أيوب', englishName: 'Muhammad Ayyub', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/ayoub/'),
       Reciter(identifier: 'ar.muhammadjibreel', name: 'محمد جبريل', englishName: 'Muhammad Jibreel', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/jibr/'),
-      Reciter(identifier: 'ar.sa3d_alghaamdi', name: 'سعد الغامدي', englishName: 'Saad Al-Ghamdi', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/gmd/'),
+      Reciter(identifier: 'ar.sa3d_alghaamdi', name: 'سعد الغامدي', englishName: 'Saad Al-Ghamdi', style: 'murattal', baseUrl: 'https://server6.mp3quran.net/ghamdi/'),
       Reciter(identifier: 'ar.shaatree', name: 'أبو بكر الشاطري', englishName: 'Abu Bakr Ash-Shaatree', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/shatri/'),
     ];
     update();
@@ -221,20 +335,40 @@ class ReciterController extends GetxController {
 
       final paddedNumber = surahNumber.toString().padLeft(3, '0');
       final filePath = '${reciterDir.path}/$paddedNumber.mp3';
-      final url = _buildAudioUrl(reciter, surahNumber);
+      final candidates = buildCandidateUrls(surahNumber);
+      if (candidates.isEmpty) {
+        throw Exception('No available audio source');
+      }
 
-      debugPrint('Downloading: $url');
-
-      await _dio.download(
-        url,
-        filePath,
-        onReceiveProgress: (received, total) {
-          if (total != -1) {
-            _downloadProgress[surahNumber] = received / total;
-            update(['download_$surahNumber']);
+      Object? lastError;
+      for (final url in candidates) {
+        try {
+          debugPrint('Downloading: $url');
+          await _dio.download(
+            url,
+            filePath,
+            onReceiveProgress: (received, total) {
+              if (total != -1) {
+                _downloadProgress[surahNumber] = received / total;
+                update(['download_$surahNumber']);
+              }
+            },
+          );
+          saveResolvedBaseUrlFromUrl(reciter.id, url);
+          lastError = null;
+          break;
+        } catch (e) {
+          lastError = e;
+          final file = File(filePath);
+          if (await file.exists()) {
+            await file.delete();
           }
-        },
-      );
+        }
+      }
+
+      if (lastError != null) {
+        throw lastError;
+      }
 
       // Save to downloaded list
       if (!_downloadedSurahs.containsKey(reciter.id)) {
@@ -264,8 +398,9 @@ class ReciterController extends GetxController {
     final padded = surahNumber.toString().padLeft(3, '0');
 
     // Use baseUrl directly
-    if (reciter.baseUrl.isNotEmpty) {
-      return '${reciter.baseUrl}$padded.mp3';
+    final base = getResolvedBaseUrl(reciter);
+    if (base.isNotEmpty) {
+      return '${base}$padded.mp3';
     }
 
     // Ultimate fallback to Mishary Alafasy
@@ -400,7 +535,7 @@ class ReciterController extends GetxController {
             'ar.alafasy': 'https://server8.mp3quran.net/afs/',
             'ar.sudais': 'https://server8.mp3quran.net/swd/',
             'ar.husary': 'https://server8.mp3quran.net/husr/',
-            'ar.minshawi': 'https://server8.mp3quran.net/minsh/',
+            'ar.minshawi': 'https://server10.mp3quran.net/minsh/',
             'ar.mahermuaiqly': 'https://server8.mp3quran.net/maher/',
             'ar.abdulbasitmurattal': 'https://server8.mp3quran.net/basit/',
             'ar.saoodshuraim': 'https://server8.mp3quran.net/shur/',
@@ -416,7 +551,7 @@ class ReciterController extends GetxController {
             'ar.mohammadsaleemajid': 'https://server8.mp3quran.net/saleem/',
             'ar.muhammadayyoub': 'https://server8.mp3quran.net/ayoub/',
             'ar.muhammadjibreel': 'https://server8.mp3quran.net/jibr/',
-            'ar.saadalghamdi': 'https://server8.mp3quran.net/gmd/',
+            'ar.saadalghamdi': 'https://server6.mp3quran.net/ghamdi/',
             'ar.sahlalalawi': 'https://server8.mp3quran.net/sahl/',
             'ar.salahalbudeair': 'https://server8.mp3quran.net/salah/',
             'ar.faresabbad': 'https://server8.mp3quran.net/abbad/',

@@ -81,23 +81,38 @@ class PlayerController extends GetxController {
 
   Future<void> _streamFromRemote(int surahNumber) async {
     try {
-      final url = _reciterController.getRemoteUrl(surahNumber);
-      if (url.isEmpty) {
+      final candidates = _reciterController.buildCandidateUrls(surahNumber);
+      if (candidates.isEmpty) {
         Get.snackbar('Error', 'No reciter selected');
         return;
       }
 
-      debugPrint('📡 Streaming from: $url');
-      
-      await _audioPlayer.setUrl(url);
-      await _audioPlayer.play();
-      
-      Get.snackbar(
-        'Streaming',
-        'Playing Surah $surahNumber from ${_reciterController.selectedReciter?.nameFr}',
-        snackPosition: SnackPosition.BOTTOM,
-        duration: const Duration(seconds: 2),
-      );
+      Object? lastError;
+      for (final url in candidates) {
+        try {
+          debugPrint('📡 Streaming from: $url');
+          await _audioPlayer.setUrl(url);
+          await _audioPlayer.play();
+
+          final reciterId = _reciterController.selectedReciterId;
+          if (reciterId.isNotEmpty) {
+            _reciterController.saveResolvedBaseUrlFromUrl(reciterId, url);
+          }
+
+          Get.snackbar(
+            'Streaming',
+            'Playing Surah $surahNumber from ${_reciterController.selectedReciter?.nameFr}',
+            snackPosition: SnackPosition.BOTTOM,
+            duration: const Duration(seconds: 2),
+          );
+          return;
+        } catch (e) {
+          lastError = e;
+        }
+      }
+
+      debugPrint('❌ Stream error: $lastError');
+      Get.snackbar('Error', 'Failed to stream: ${lastError ?? 'Unknown error'}');
     } catch (e) {
       debugPrint('❌ Stream error: $e');
       Get.snackbar('Error', 'Failed to stream: ${e.toString()}');
