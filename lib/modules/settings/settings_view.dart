@@ -15,7 +15,7 @@ class SettingsView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: DT.bg(context),
-      extendBodyBehindAppBar: true,
+      extendBodyBehindAppBar: false,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -52,7 +52,7 @@ class SettingsView extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           child: Column(
             children: [
-              const SizedBox(height: 80),
+              const SizedBox(height: 4),
               _buildSection(
                 title: 'Notifications'.trx,
                 icon: Icons.notifications_outlined,

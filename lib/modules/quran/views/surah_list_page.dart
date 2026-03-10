@@ -99,7 +99,7 @@ class SurahListPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: _C.bg(context),
-      extendBodyBehindAppBar: true,
+      extendBodyBehindAppBar: false,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -174,7 +174,7 @@ class SurahListPage extends StatelessWidget {
 
           return CustomScrollView(
             slivers: [
-              const SliverToBoxAdapter(child: SizedBox(height: 96)),
+              const SliverToBoxAdapter(child: SizedBox(height: 4)),
               SliverToBoxAdapter(child: _reciterCard(context)),
               SliverToBoxAdapter(child: _playerBar(context, playerController)),
               SliverToBoxAdapter(child: _listHeader(context)),

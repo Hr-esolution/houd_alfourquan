@@ -13,7 +13,7 @@ class SurahDownloadPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: DT.bg(context),
-      extendBodyBehindAppBar: true,
+      extendBodyBehindAppBar: false,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -56,15 +56,15 @@ class SurahDownloadPage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          const SizedBox(height: 80),
+          const SizedBox(height: 4),
           GetBuilder<ReciterController>(
             builder: (controller) {
               final reciter = controller.selectedReciter;
               final downloadedCount = controller.downloadedSurahs[controller.selectedReciterId]?.length ?? 0;
 
               return Glass(
-                margin: const EdgeInsets.all(16),
-                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 child: Column(
                   children: [
                     Row(
@@ -77,7 +77,7 @@ class SurahDownloadPage extends StatelessWidget {
                               reciter?.translatedName ?? 'Select a reciter',
                               style: DT.titleMd(context).copyWith(fontWeight: FontWeight.w700),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 3),
                             DHBadge(text: '$downloadedCount/114'),
                           ],
                         ),
@@ -93,7 +93,7 @@ class SurahDownloadPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
                     GetBuilder<ReciterController>(
                       id: 'bulk_download',
                       builder: (controller) {
@@ -128,7 +128,7 @@ class SurahDownloadPage extends StatelessWidget {
                             icon: Icons.download,
                             onTap: () => controller.downloadAllSequential(),
                             tooltip: 'Download All',
-                            size: 40,
+                            size: 34,
                           ),
                         );
                       },
@@ -145,7 +145,7 @@ class SurahDownloadPage extends StatelessWidget {
                   return const Center(child: CircularProgressIndicator());
                 }
                 return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   itemCount: controller.surahs.length,
                   itemBuilder: (context, index) {
                     final surah = controller.surahs[index];
@@ -177,54 +177,75 @@ class _SurahDownloadItem extends StatelessWidget {
 
         return Glass(
           margin: const EdgeInsets.only(bottom: 6),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           child: Column(
             children: [
-              ListTile(
-                leading: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    gradient: isDownloaded ? LinearGradient(colors: DT.accentGrad(context)) : null,
-                    color: isDownloaded ? null : DT.divider(context),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${surah.number}',
-                      style: const TextStyle(
-                        color: DT.blanc,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
+              Row(
+                children: [
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      gradient: isDownloaded ? LinearGradient(colors: DT.accentGrad(context)) : null,
+                      color: isDownloaded ? null : DT.divider(context),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${surah.number}',
+                        style: const TextStyle(
+                          color: DT.blanc,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                title: Text(
-                  surah.nameFr,
-                  style: DT.titleMd(context),
-                ),
-                subtitle: Text(
-                  surah.nameAr,
-                  style: DT.sub(context),
-                ),
-                trailing: _buildActionWidget(
-                  context,
-                  controller,
-                  surah.number,
-                  isDownloaded,
-                  isDownloading,
-                  progress,
-                ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          surah.nameAr,
+                          textDirection: TextDirection.rtl,
+                          style: DT.titleMd(context).copyWith(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: DT.txt(context),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${surah.nameFr} • ${surah.nameEn}',
+                          style: DT.sub(context).copyWith(fontSize: 12),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  _buildActionWidget(
+                    context,
+                    controller,
+                    surah.number,
+                    isDownloaded,
+                    isDownloading,
+                    progress,
+                  ),
+                ],
               ),
               if (isDownloading && progress > 0)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.only(top: 6),
                   child: LinearProgressIndicator(
                     value: progress,
                     backgroundColor: DT.divider(context),
                     valueColor: AlwaysStoppedAnimation(DT.or),
-                    minHeight: 4,
+                    minHeight: 3,
                   ),
                 ),
             ],
@@ -244,8 +265,8 @@ class _SurahDownloadItem extends StatelessWidget {
   ) {
     if (isDownloading) {
       return SizedBox(
-        width: 32,
-        height: 32,
+        width: 28,
+        height: 28,
         child: CircularProgressIndicator(
           strokeWidth: 2,
           value: progress > 0 ? progress : null,
@@ -258,12 +279,12 @@ class _SurahDownloadItem extends StatelessWidget {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.check_circle, color: DT.accent(context), size: 20),
-          const SizedBox(width: 8),
+          Icon(Icons.check_circle, color: DT.accent(context), size: 18),
+          const SizedBox(width: 6),
           ActionBtn(
             icon: Icons.delete_outline,
             onTap: () => controller.deleteSurah(surahNumber),
-            size: 30,
+            size: 28,
             colors: [Colors.red.shade400, Colors.red.shade300],
           ),
         ],
@@ -273,7 +294,7 @@ class _SurahDownloadItem extends StatelessWidget {
     return ActionBtn(
       icon: Icons.cloud_download,
       onTap: () => controller.downloadSurah(surahNumber),
-      size: 30,
+      size: 28,
       colors: [DT.orDark, DT.or],
     );
   }

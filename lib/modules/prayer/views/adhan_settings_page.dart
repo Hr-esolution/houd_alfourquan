@@ -13,7 +13,7 @@ class AdhanSettingsPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: DT.bg(context),
-      extendBodyBehindAppBar: true,
+      extendBodyBehindAppBar: false,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -41,7 +41,7 @@ class AdhanSettingsPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const SizedBox(height: 80),
+          const SizedBox(height: 4),
           // Section: Adhan locaux disponibles
           _buildSectionTitle(context, 'Adhan disponibles'),
           const SizedBox(height: 8),

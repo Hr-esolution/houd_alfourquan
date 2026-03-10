@@ -27,9 +27,7 @@ class ReciterController extends GetxController {
       'https://server6.mp3quran.net/ghamdi/',
       'https://server7.mp3quran.net/s_gmd/',
     ],
-    'ar.minshawi': [
-      'https://server10.mp3quran.net/minsh/',
-    ],
+    'ar.minshawi': ['https://server10.mp3quran.net/minsh/'],
   };
 
   // Data
@@ -57,7 +55,8 @@ class ReciterController extends GetxController {
 
   Reciter? get selectedReciter {
     if (_reciters.isEmpty) return null;
-    if (_selectedReciterId.isEmpty || !_reciters.any((r) => r.id == _selectedReciterId)) {
+    if (_selectedReciterId.isEmpty ||
+        !_reciters.any((r) => r.id == _selectedReciterId)) {
       _selectedReciterId = _reciters.first.id;
       _storage.write('selected_reciter', _selectedReciterId);
     }
@@ -126,7 +125,9 @@ class ReciterController extends GetxController {
     try {
       final cached = _storage.read('reciter_base_overrides');
       if (cached != null) {
-        final Map<String, dynamic> data = Map<String, dynamic>.from(jsonDecode(cached));
+        final Map<String, dynamic> data = Map<String, dynamic>.from(
+          jsonDecode(cached),
+        );
         _baseOverrides
           ..clear()
           ..addAll(data.map((k, v) => MapEntry(k, v.toString())));
@@ -180,7 +181,7 @@ class ReciterController extends GetxController {
 
     void addBase(String candidateBase) {
       final normalized = _normalizeBaseUrl(candidateBase);
-      final url = '${normalized}$padded.mp3';
+      final url = '$normalized$padded.mp3';
       if (seen.add(url)) {
         urls.add(url);
       }
@@ -219,56 +220,332 @@ class ReciterController extends GetxController {
   void _loadDefaultReciters() {
     _reciters = [
       // Récitateurs les plus populaires
-      Reciter(identifier: 'ar.alafasy', name: 'مشاري العفاسي', englishName: 'Mishary Alafasy', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/afs/'),
-      Reciter(identifier: 'ar.sudais', name: 'عبد الرحمن السديس', englishName: 'Abdurrahman Al-Sudais', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/swd/'),
-      Reciter(identifier: 'ar.husary', name: 'محمود خليل الحصري', englishName: 'Mahmoud Khalil Al-Husary', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/husr/'),
-      Reciter(identifier: 'ar.minshawi', name: 'محمد صديق المنشاوي', englishName: 'Mohamed Siddiq El-Minshawi', style: 'murattal', baseUrl: 'https://server10.mp3quran.net/minsh/'),
-      Reciter(identifier: 'ar.mahermuaiqly', name: 'ماهر المعيقلي', englishName: 'Maher Al-Muaiqly', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/maher/'),
-      Reciter(identifier: 'ar.abdulbasitmurattal', name: 'عبد الباسط عبد الصمد', englishName: 'Abdul Basit (Murattal)', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/basit/'),
-      Reciter(identifier: 'ar.saoodshuraim', name: 'سعود الشريم', englishName: 'Saud Al-Shuraim', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/shur/'),
-      Reciter(identifier: 'ar.ahmedajmy', name: 'أحمد بن علي العجمي', englishName: 'Ahmed ibn Ali al-Ajmy', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/ajmy/'),
-      
+      Reciter(
+        identifier: 'ar.alafasy',
+        name: 'مشاري العفاسي',
+        englishName: 'Mishary Alafasy',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/afs/',
+      ),
+      Reciter(
+        identifier: 'ar.sudais',
+        name: 'عبد الرحمن السديس',
+        englishName: 'Abdurrahman Al-Sudais',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/swd/',
+      ),
+      Reciter(
+        identifier: 'ar.husary',
+        name: 'محمود خليل الحصري',
+        englishName: 'Mahmoud Khalil Al-Husary',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/husr/',
+      ),
+      Reciter(
+        identifier: 'ar.minshawi',
+        name: 'محمد صديق المنشاوي',
+        englishName: 'Mohamed Siddiq El-Minshawi',
+        style: 'murattal',
+        baseUrl: 'https://server10.mp3quran.net/minsh/',
+      ),
+      Reciter(
+        identifier: 'ar.mahermuaiqly',
+        name: 'ماهر المعيقلي',
+        englishName: 'Maher Al-Muaiqly',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/maher/',
+      ),
+      Reciter(
+        identifier: 'ar.abdulbasitmurattal',
+        name: 'عبد الباسط عبد الصمد',
+        englishName: 'Abdul Basit (Murattal)',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/basit/',
+      ),
+      Reciter(
+        identifier: 'ar.saoodshuraim',
+        name: 'سعود الشريم',
+        englishName: 'Saud Al-Shuraim',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/shur/',
+      ),
+      Reciter(
+        identifier: 'ar.ahmedajmy',
+        name: 'أحمد بن علي العجمي',
+        englishName: 'Ahmed ibn Ali al-Ajmy',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/ajmy/',
+      ),
+
       // Autres récitateurs populaires
-      Reciter(identifier: 'ar.hanirifai', name: 'هاني الرفاعي', englishName: 'Hani ar-Rifai', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/rifai/'),
-      Reciter(identifier: 'ar.husarymujawwad', name: 'محمود خليل الحصري (مجود)', englishName: 'Mahmoud Khalil Al-Husary (Mujawwad)', style: 'mujawwad', baseUrl: 'https://server8.mp3quran.net/husr_m/'),
-      Reciter(identifier: 'ar.abdullahbasfar', name: 'عبد الله بصفر', englishName: 'Abdullah Basfar', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/basfar/'),
-      Reciter(identifier: 'ar.abdulmuhsinalqasim', name: 'عبد المحسن القاسم', englishName: 'AbdulMuhsin Al-Qasim', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/qasim/'),
-      Reciter(identifier: 'ar.abuubakralshatri', name: 'أبو بكر الشاطري', englishName: 'Abu Bakr al-Shatri', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/shatri/'),
-      Reciter(identifier: 'ar.hudhaify', name: 'علي الحذيفي', englishName: 'Ali Al-Hudhaify', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/hudh/'),
-      Reciter(identifier: 'ar.yasseraldosari', name: 'ياسر الدوسري', englishName: 'Yasser Al-Dosari', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/yasser/'),
-      Reciter(identifier: 'ar.mohammadsaleemajid', name: 'محمد سليم', englishName: 'Mohammad Saleem', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/saleem/'),
-      Reciter(identifier: 'ar.muhammadayyoub', name: 'محمد أيوب', englishName: 'Muhammad Ayyub', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/ayoub/'),
-      Reciter(identifier: 'ar.muhammadjibreel', name: 'محمد جبريل', englishName: 'Muhammad Jibreel', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/jibr/'),
-      Reciter(identifier: 'ar.saadalghamdi', name: 'سعد الغامدي', englishName: 'Saad Al-Ghamdi', style: 'murattal', baseUrl: 'https://server6.mp3quran.net/ghamdi/'),
-      Reciter(identifier: 'ar.sahlalalawi', name: 'سهل الياسين', englishName: 'Sahl Al-Yassin', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/sahl/'),
-      Reciter(identifier: 'ar.salahalbudeair', name: 'صلاح البدير', englishName: 'Salah Al-Budeair', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/salah/'),
-      Reciter(identifier: 'ar.faresabbad', name: 'فارس عباد', englishName: 'Fares Abbad', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/abbad/'),
-      Reciter(identifier: 'ar.nasserqatami', name: 'ناصر القطامي', englishName: 'Nasser Al-Qatami', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/qatami/'),
-      
+      Reciter(
+        identifier: 'ar.hanirifai',
+        name: 'هاني الرفاعي',
+        englishName: 'Hani ar-Rifai',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/rifai/',
+      ),
+      Reciter(
+        identifier: 'ar.husarymujawwad',
+        name: 'محمود خليل الحصري (مجود)',
+        englishName: 'Mahmoud Khalil Al-Husary (Mujawwad)',
+        style: 'mujawwad',
+        baseUrl: 'https://server8.mp3quran.net/husr_m/',
+      ),
+      Reciter(
+        identifier: 'ar.abdullahbasfar',
+        name: 'عبد الله بصفر',
+        englishName: 'Abdullah Basfar',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/basfar/',
+      ),
+      Reciter(
+        identifier: 'ar.abdulmuhsinalqasim',
+        name: 'عبد المحسن القاسم',
+        englishName: 'AbdulMuhsin Al-Qasim',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/qasim/',
+      ),
+      Reciter(
+        identifier: 'ar.abuubakralshatri',
+        name: 'أبو بكر الشاطري',
+        englishName: 'Abu Bakr al-Shatri',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/shatri/',
+      ),
+      Reciter(
+        identifier: 'ar.hudhaify',
+        name: 'علي الحذيفي',
+        englishName: 'Ali Al-Hudhaify',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/hudh/',
+      ),
+      Reciter(
+        identifier: 'ar.yasseraldosari',
+        name: 'ياسر الدوسري',
+        englishName: 'Yasser Al-Dosari',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/yasser/',
+      ),
+      Reciter(
+        identifier: 'ar.mohammadsaleemajid',
+        name: 'محمد سليم',
+        englishName: 'Mohammad Saleem',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/saleem/',
+      ),
+      Reciter(
+        identifier: 'ar.muhammadayyoub',
+        name: 'محمد أيوب',
+        englishName: 'Muhammad Ayyub',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/ayoub/',
+      ),
+      Reciter(
+        identifier: 'ar.muhammadjibreel',
+        name: 'محمد جبريل',
+        englishName: 'Muhammad Jibreel',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/jibr/',
+      ),
+      Reciter(
+        identifier: 'ar.saadalghamdi',
+        name: 'سعد الغامدي',
+        englishName: 'Saad Al-Ghamdi',
+        style: 'murattal',
+        baseUrl: 'https://server6.mp3quran.net/ghamdi/',
+      ),
+      Reciter(
+        identifier: 'ar.sahlalalawi',
+        name: 'سهل الياسين',
+        englishName: 'Sahl Al-Yassin',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/sahl/',
+      ),
+      Reciter(
+        identifier: 'ar.salahalbudeair',
+        name: 'صلاح البدير',
+        englishName: 'Salah Al-Budeair',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/salah/',
+      ),
+      Reciter(
+        identifier: 'ar.faresabbad',
+        name: 'فارس عباد',
+        englishName: 'Fares Abbad',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/abbad/',
+      ),
+      Reciter(
+        identifier: 'ar.nasserqatami',
+        name: 'ناصر القطامي',
+        englishName: 'Nasser Al-Qatami',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/qatami/',
+      ),
+
       // Récitateurs additionnels
-      Reciter(identifier: 'ar.ibrahimakhbar', name: 'إبراهيم الأخضر', englishName: 'Ibrahim Al-Akhdar', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/akhdar/'),
-      Reciter(identifier: 'ar.khalilalhusary', name: 'محمود خليل الحصري', englishName: 'Khalil Al-Husary', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/husr/'),
-      Reciter(identifier: 'ar.abdulbasitmujawwad', name: 'عبد الباسط عبد الصمد (مجود)', englishName: 'Abdul Basit (Mujawwad)', style: 'mujawwad', baseUrl: 'https://server8.mp3quran.net/basit_m/'),
-      Reciter(identifier: 'ar.aymansueed', name: 'أيمن سويد', englishName: 'Ayman Suwaid', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/suwaid/'),
-      Reciter(identifier: 'ar.abdurrahmaanmaash', name: 'عبد الرحمن معاش', englishName: 'Abdul Rahman Maash', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/maash/'),
-      Reciter(identifier: 'ar.aliabdurrahmaan', name: 'علي عبد الرحمن', englishName: 'Ali Abdur-Rahman', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/hudh/'),
-      Reciter(identifier: 'ar.faresabbaad', name: 'فارس عباد', englishName: 'Fares Abbad', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/abbad/'),
-      Reciter(identifier: 'ar.hazaabalbalami', name: 'حازم الحازمي', englishName: 'Hazem Al-Hazmi', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/hazmi/'),
-      Reciter(identifier: 'ar.khalidqahtani', name: 'خالد القحطاني', englishName: 'Khalid Al-Qahtani', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/qahtani/'),
-      Reciter(identifier: 'ar.muhammadmuhsin', name: 'محمد محسن', englishName: 'Muhammad Muhsin', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/muhsin/'),
-      Reciter(identifier: 'ar.saadalghaamdi', name: 'سعد الغامدي', englishName: 'Saad Al-Ghamdi', style: 'murattal', baseUrl: 'https://server6.mp3quran.net/ghamdi/'),
-      Reciter(identifier: 'ar.suoodshuraym', name: 'سعود الشريم', englishName: 'Saud Al-Shuraim', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/shur/'),
-      Reciter(identifier: 'ar.yasseralkahtani', name: 'ياسر القحطاني', englishName: 'Yasser Al-Kahtani', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/kahtani/'),
-      Reciter(identifier: 'ar.abdullaahkhalifa', name: 'عبد الله خليفة', englishName: 'Abdullah Khalifa', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/khalifa/'),
-      Reciter(identifier: 'ar.abdulwahhab', name: 'عبد الوهاب الطريري', englishName: 'Abdul Wahhab Al-Tariri', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/tariri/'),
-      Reciter(identifier: 'ar.haniarrefaee', name: 'هاني الرفاعي', englishName: 'Hani Ar-Rifai', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/rifai/'),
-      Reciter(identifier: 'ar.husarychildren', name: 'الحصري (أطفال)', englishName: 'Al-Husary (Children)', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/husr_children/'),
-      Reciter(identifier: 'ar.jabri', name: 'محمد جبريل', englishName: 'Muhammad Jibril', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/jibr/'),
-      Reciter(identifier: 'ar.mishaari', name: 'مشاري العفاسي', englishName: 'Mishary Rashid Alafasy', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/afs/'),
-      Reciter(identifier: 'ar.muhammadaiyoob', name: 'محمد أيوب', englishName: 'Muhammad Ayyub', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/ayoub/'),
-      Reciter(identifier: 'ar.muhammadjibreel', name: 'محمد جبريل', englishName: 'Muhammad Jibreel', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/jibr/'),
-      Reciter(identifier: 'ar.sa3d_alghaamdi', name: 'سعد الغامدي', englishName: 'Saad Al-Ghamdi', style: 'murattal', baseUrl: 'https://server6.mp3quran.net/ghamdi/'),
-      Reciter(identifier: 'ar.shaatree', name: 'أبو بكر الشاطري', englishName: 'Abu Bakr Ash-Shaatree', style: 'murattal', baseUrl: 'https://server8.mp3quran.net/shatri/'),
+      Reciter(
+        identifier: 'ar.ibrahimakhbar',
+        name: 'إبراهيم الأخضر',
+        englishName: 'Ibrahim Al-Akhdar',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/akhdar/',
+      ),
+      Reciter(
+        identifier: 'ar.khalilalhusary',
+        name: 'محمود خليل الحصري',
+        englishName: 'Khalil Al-Husary',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/husr/',
+      ),
+      Reciter(
+        identifier: 'ar.abdulbasitmujawwad',
+        name: 'عبد الباسط عبد الصمد (مجود)',
+        englishName: 'Abdul Basit (Mujawwad)',
+        style: 'mujawwad',
+        baseUrl: 'https://server8.mp3quran.net/basit_m/',
+      ),
+      Reciter(
+        identifier: 'ar.aymansueed',
+        name: 'أيمن سويد',
+        englishName: 'Ayman Suwaid',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/suwaid/',
+      ),
+      Reciter(
+        identifier: 'ar.abdurrahmaanmaash',
+        name: 'عبد الرحمن معاش',
+        englishName: 'Abdul Rahman Maash',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/maash/',
+      ),
+      Reciter(
+        identifier: 'ar.aliabdurrahmaan',
+        name: 'علي عبد الرحمن',
+        englishName: 'Ali Abdur-Rahman',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/hudh/',
+      ),
+      Reciter(
+        identifier: 'ar.faresabbaad',
+        name: 'فارس عباد',
+        englishName: 'Fares Abbad',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/abbad/',
+      ),
+      Reciter(
+        identifier: 'ar.hazaabalbalami',
+        name: 'حازم الحازمي',
+        englishName: 'Hazem Al-Hazmi',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/hazmi/',
+      ),
+      Reciter(
+        identifier: 'ar.khalidqahtani',
+        name: 'خالد القحطاني',
+        englishName: 'Khalid Al-Qahtani',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/qahtani/',
+      ),
+      Reciter(
+        identifier: 'ar.muhammadmuhsin',
+        name: 'محمد محسن',
+        englishName: 'Muhammad Muhsin',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/muhsin/',
+      ),
+      Reciter(
+        identifier: 'ar.saadalghaamdi',
+        name: 'سعد الغامدي',
+        englishName: 'Saad Al-Ghamdi',
+        style: 'murattal',
+        baseUrl: 'https://server6.mp3quran.net/ghamdi/',
+      ),
+      Reciter(
+        identifier: 'ar.suoodshuraym',
+        name: 'سعود الشريم',
+        englishName: 'Saud Al-Shuraim',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/shur/',
+      ),
+      Reciter(
+        identifier: 'ar.yasseralkahtani',
+        name: 'ياسر القحطاني',
+        englishName: 'Yasser Al-Kahtani',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/kahtani/',
+      ),
+      Reciter(
+        identifier: 'ar.abdullaahkhalifa',
+        name: 'عبد الله خليفة',
+        englishName: 'Abdullah Khalifa',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/khalifa/',
+      ),
+      Reciter(
+        identifier: 'ar.abdulwahhab',
+        name: 'عبد الوهاب الطريري',
+        englishName: 'Abdul Wahhab Al-Tariri',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/tariri/',
+      ),
+      Reciter(
+        identifier: 'ar.haniarrefaee',
+        name: 'هاني الرفاعي',
+        englishName: 'Hani Ar-Rifai',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/rifai/',
+      ),
+      Reciter(
+        identifier: 'ar.husarychildren',
+        name: 'الحصري (أطفال)',
+        englishName: 'Al-Husary (Children)',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/husr_children/',
+      ),
+      Reciter(
+        identifier: 'ar.jabri',
+        name: 'محمد جبريل',
+        englishName: 'Muhammad Jibril',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/jibr/',
+      ),
+      Reciter(
+        identifier: 'ar.mishaari',
+        name: 'مشاري العفاسي',
+        englishName: 'Mishary Rashid Alafasy',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/afs/',
+      ),
+      Reciter(
+        identifier: 'ar.muhammadaiyoob',
+        name: 'محمد أيوب',
+        englishName: 'Muhammad Ayyub',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/ayoub/',
+      ),
+      Reciter(
+        identifier: 'ar.muhammadjibreel',
+        name: 'محمد جبريل',
+        englishName: 'Muhammad Jibreel',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/jibr/',
+      ),
+      Reciter(
+        identifier: 'ar.sa3d_alghaamdi',
+        name: 'سعد الغامدي',
+        englishName: 'Saad Al-Ghamdi',
+        style: 'murattal',
+        baseUrl: 'https://server6.mp3quran.net/ghamdi/',
+      ),
+      Reciter(
+        identifier: 'ar.shaatree',
+        name: 'أبو بكر الشاطري',
+        englishName: 'Abu Bakr Ash-Shaatree',
+        style: 'murattal',
+        baseUrl: 'https://server8.mp3quran.net/shatri/',
+      ),
     ];
     update();
   }
@@ -284,7 +561,9 @@ class ReciterController extends GetxController {
   void _loadDownloadedSurahs() {
     final downloadedMap = _storage.read('downloaded_map');
     if (downloadedMap != null) {
-      final Map<String, dynamic> data = Map<String, dynamic>.from(jsonDecode(downloadedMap));
+      final Map<String, dynamic> data = Map<String, dynamic>.from(
+        jsonDecode(downloadedMap),
+      );
       _downloadedSurahs = data.map((key, value) {
         return MapEntry(key, (value as List).map((e) => e as int).toList());
       });
@@ -400,7 +679,7 @@ class ReciterController extends GetxController {
     // Use baseUrl directly
     final base = getResolvedBaseUrl(reciter);
     if (base.isNotEmpty) {
-      return '${base}$padded.mp3';
+      return '$base$padded.mp3';
     }
 
     // Ultimate fallback to Mishary Alafasy
@@ -412,7 +691,8 @@ class ReciterController extends GetxController {
 
     try {
       final directory = await getApplicationDocumentsDirectory();
-      final filePath = '${directory.path}/quran/$_selectedReciterId/${surahNumber.toString().padLeft(3, '0')}.mp3';
+      final filePath =
+          '${directory.path}/quran/$_selectedReciterId/${surahNumber.toString().padLeft(3, '0')}.mp3';
       final file = File(filePath);
 
       if (await file.exists()) {
@@ -514,15 +794,17 @@ class ReciterController extends GetxController {
 
   Future<bool> hasConnection() async {
     final result = await Connectivity().checkConnectivity();
-    return result.any((r) => r == ConnectivityResult.wifi || r == ConnectivityResult.mobile);
+    return result.any(
+      (r) => r == ConnectivityResult.wifi || r == ConnectivityResult.mobile,
+    );
   }
 
   Future<void> refreshReciters() async {
     debugPrint('🔄 Refreshing reciters from API...');
     try {
-      final response = await _dio.get(
-        'https://api.alquran.cloud/v1/edition?format=audio&language=ar',
-      ).timeout(const Duration(seconds: 15));
+      final response = await _dio
+          .get('https://api.alquran.cloud/v1/edition?format=audio&language=ar')
+          .timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final data = response.data;
@@ -575,7 +857,9 @@ class ReciterController extends GetxController {
             final type = edition['type'] as String? ?? '';
             final format = edition['format'] as String? ?? '';
 
-            if (lang != 'ar' || type != 'versebyverse' || format != 'audio') continue;
+            if (lang != 'ar' || type != 'versebyverse' || format != 'audio') {
+              continue;
+            }
 
             final baseUrl = mp3quranUrls[identifier] ?? '';
 
@@ -588,8 +872,11 @@ class ReciterController extends GetxController {
             });
           }
 
-          reciterList.sort((a, b) =>
-            (a['englishName'] as String).compareTo(b['englishName'] as String));
+          reciterList.sort(
+            (a, b) => (a['englishName'] as String).compareTo(
+              b['englishName'] as String,
+            ),
+          );
 
           _reciters = reciterList.map((r) => Reciter.fromMap(r)).toList();
           await _storage.write('reciters_cache', jsonEncode(reciterList));

@@ -17,7 +17,7 @@ class TermsOfServiceView extends StatelessWidget {
       textDirection: textDirection,
       child: Scaffold(
         backgroundColor: DT.bg(context),
-        extendBodyBehindAppBar: true,
+        extendBodyBehindAppBar: false,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -55,7 +55,7 @@ class TermsOfServiceView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 4),
                     _buildHeader(context),
                     const SizedBox(height: 24),
                     _buildSection(
