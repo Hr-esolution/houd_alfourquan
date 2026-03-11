@@ -50,7 +50,15 @@ class MyApp extends StatelessWidget {
       scaffoldBackgroundColor: const Color(0xFF0A0A0A),
       appBarTheme: const AppBarTheme(
         backgroundColor: Color(0xFF0A0A0A),
+        foregroundColor: Colors.white,
         elevation: 0,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: Colors.white),
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       cardTheme: CardThemeData(
         color: const Color(0xFF181818),
@@ -70,7 +78,15 @@ class MyApp extends StatelessWidget {
       scaffoldBackgroundColor: const Color(0xFFFFFFFF),
       appBarTheme: const AppBarTheme(
         backgroundColor: Color(0xFFFFFFFF),
+        foregroundColor: Colors.black,
         elevation: 0,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: Colors.black),
+        titleTextStyle: TextStyle(
+          color: Colors.black,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       cardTheme: CardThemeData(
         color: const Color(0xFFFFFFFF),
