@@ -612,6 +612,59 @@ const Map<String, Map<String, String>> _translations = {
   },
 
   // ═══════════════════════════════════════════════════════════════
+  //  DOUAA
+  // ═══════════════════════════════════════════════════════════════
+  'Douaa': {
+    'fr': 'Douaa',
+    'en': 'Duaa',
+    'ar': 'الدعاء',
+  },
+  'Supplications': {
+    'fr': 'Supplications',
+    'en': 'Supplications',
+    'ar': 'الأدعية',
+  },
+  'Douaa du Coran': {
+    'fr': 'Douaa du Coran',
+    'en': 'Quranic Duaas',
+    'ar': 'أدعية من القرآن',
+  },
+  'Douaa du Prophète': {
+    'fr': 'Douaa du Prophète',
+    'en': 'Prophetic Duaas',
+    'ar': 'أدعية من السنة',
+  },
+  'supplications': {
+    'fr': 'supplications',
+    'en': 'supplications',
+    'ar': 'دعاء',
+  },
+  'Wird': {
+    'fr': 'Wird',
+    'en': 'Wird',
+    'ar': 'الورد',
+  },
+  'Journalier': {
+    'fr': 'Journalier',
+    'en': 'Daily',
+    'ar': 'اليومي',
+  },
+  'Daily': {
+    'fr': 'Quotidien',
+    'en': 'Daily',
+    'ar': 'اليومي',
+  },
+  'À propos': {
+    'fr': 'À propos',
+    'en': 'About',
+    'ar': 'حول',
+  },
+  'Les douas sont des invocations tirées du Coran et de la Sunnah': {
+    'fr': 'Les douas sont des invocations tirées du Coran et de la Sunnah',
+    'en': 'Duas are supplications from the Quran and Sunnah',
+    'ar': 'الأدعية هي أدعية من القرآن والسنة',
+  },
+  // ═══════════════════════════════════════════════════════════════
   //  QURAN - SURAH NAMES (114)
   // ═══════════════════════════════════════════════════════════════
   'Al-Fatiha': {

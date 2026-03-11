@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "duas": [
+    {
+      "id": 1,
+      "category": "quran",
+      "arabic": "رَبَّنَا وَاجْعَلْنَا مُسْلِمَيْنِ لَكَ وَمِن ذُرِّيَّتِنَا أُمَّةً مُّسْلِمَةً لَّكَ وَأَرِنَا مَنَاسِكَنَا وَتُبْ عَلَيْنَآ إِنَّكَ أَنتَ التَّوَّابُ الرَّحِيمُ",
+      "translations": {
+        "fr": "Seigneur, fais de nous et de notre descendance une communauté soumise à Toi, montre-nous nos rites et accepte notre repentir, car Tu es le Repentant, le Miséricordieux",
+        "en": "Our Lord, make us and our offspring a Muslim community, show us our rites, and accept our repentance; indeed You are the Most Forgiving, Most Merciful"
+      },
+      "reference": "",
+      "repeat": 1
+    },
+    {
+      "id": 2,
+      "category": "quran",
+      "arabic": "رَبَّنَآ اٰتِنَا فِي الدُّنْيَا حَسَنَةً وَّفِي الْاٰخِرَةِ حَسَـنَةً وَّقِنَا عَذَابَ النَّارِ",
+      "translations": {
+        "fr": "Seigneur, accorde-nous le bien ici-bas et le bien dans l'au-delà et protège-nous du châtiment du Feu",
+        "en": "Our Lord, give us good in this world and good in the Hereafter, and protect us from the punishment of the Fire"
+      },
+      "reference": "Quran 2:201",
+      "repeat": 1
+    },
+    {
+      "id": 3,
+      "category": "quran",
+      "arabic": "رَبَّنَا أَفْرِغْ عَلَيْنَا صَبْراً وَثَبِّتْ أَقْدَامَنَا وَانصُرْنَا عَلَى القَوْمِ الكَافِرِينَ",
+      "translations": {
+        "fr": "Seigneur, accorde-nous patience, affermis nos pas et aide-nous contre les mécréants",
+        "en": "Our Lord, pour patience upon us, make our steps firm, and grant us victory over the disbelieving people"
+      },
+      "reference": "",
+      "repeat": 1
+    },
+    {
+      "id": 4,
+      "category": "quran",
+      "arabic": "رَبَّنَا لَا تُؤَاخِذْنَآ اِنْ نَّسِيْنَآ اَوْ اَخْطَاْنَا ۚ رَبَّنَا وَلَا تَحْمِلْ عَلَيْنَآ اِصْرًا كَمَا حَمَلْتَهٗ عَلَي الَّذِيْنَ مِنْ قَبْلِنَا ۚ رَبَّنَا وَلَا تُحَمِّلْنَا مَا لَا طَاقَةَ لَنَا بِهٖ ۚ وَاعْفُ عَنَّا ۪ وَاغْفِرْ لَنَا ۪ وَارْحَمْنَا ۪ اَنْتَ مَوْلٰىنَا فَانْــصُرْنَا عَلَي الْقَوْمِ الْكٰفِرِيْنَ",
+      "translations": {
+        "fr": "Seigneur, ne nous punis pas si nous oublions ou faisons une erreur, ne nous impose pas de fardeaux comme Tu l'as fait pour ceux avant nous, pardonne-nous et fais-nous miséricorde et aide-nous contre les mécréants",
+        "en": "Our Lord, do not punish us if we forget or err, and do not lay upon us a burden as You did upon those before us, forgive us, have mercy on us, and grant us victory over the disbelievers"
+      },
+      "reference": "Quran 2:286",
+      "repeat": 1
+    },
+    {
+      "id": 5,
+      "category": "quran",
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوْبَنَا بَعْدَ اِذْ ھَدَيْتَنَا وَھَبْ لَنَا مِنْ لَّدُنْكَ رَحْمَةً ۚ اِنَّكَ اَنْتَ الْوَھَّابُ",
+      "translations": {
+        "fr": "Seigneur, ne dévie pas nos cœurs après nous avoir guidés et accorde-nous de Ta miséricorde, car Tu es le Donateur",
+        "en": "Our Lord, let not our hearts deviate after You have guided us, and grant us mercy from Yourself; indeed You are the Bestower"
+      },
+      "reference": "",
+      "repeat": 1
+    },
+    {
+      "id": 6,
+      "category": "quran",
+      "arabic": "رَبَّنَآ اِنَّنَآ اٰمَنَّا فَاغْفِرْ لَنَا ذُنُوْبَنَا وَقِنَا عَذَابَ النَّارِ",
+      "translations": {
+        "fr": "Seigneur, nous avons cru, pardonne nos péchés et protège-nous du châtiment du Feu",
+        "en": "Our Lord, indeed we have believed; forgive us our sins and save us from the punishment of the Fire"
+      },
+      "reference": "",
+      "repeat": 1
+    },
+    {
+      "id": 7,
+      "category": "quran",
+      "arabic": "رَبَّنَآ ءَامَنَّا بِمَآ أَنزَلۡتَ وَٱتَّبَعْنَا ٱلرَّسُولَ فَٱكۡتُبۡنَا مَعَ ٱلشَّٰهِدِينَ",
+      "translations": {
+        "fr": "Seigneur, nous avons cru en ce que Tu as révélé et avons suivi le Messager; inscris-nous parmi les témoins",
+        "en": "Our Lord, we have believed in what You revealed and followed the Messenger; record us among the witnesses"
+      },
+      "reference": "",
+      "repeat": 1
+    },
+    {
+      "id": 8,
+      "category": "quran",
+      "arabic": "رَبَّنَا اغْفِرْ لَنَا ذُنُوْبَنَا وَ اِسْرَافَنَا فِيْٓ اَمْرِنَا وَثَبِّتْ اَقْدَامَنَا وَانْصُرْنَا عَلَي الْقَوْمِ الْكٰفِرِيْنَ",
+      "translations": {
+        "fr": "Seigneur, pardonne nos péchés et nos excès, affermis nos pas et aide-nous contre les mécréants",
+        "en": "Our Lord, forgive us our sins and our excesses, make our steps firm, and grant us victory over the disbelieving people"
+      },
+      "reference": "",
+      "repeat": 1
+    },
+    {
+      "id": 9,
+      "category": "quran",
+      "arabic": "رَبَّنَا مَا خَلَقْتَ هٰذَا بَاطِلًا ۚ سُبْحٰنَكَ فَقِنَا عَذَابَ النَّارِ",
+      "translations": {
+        "fr": "Seigneur, Tu n'as pas créé ceci en vain; Gloire à Toi, protège-nous du châtiment du Feu",
+        "en": "Our Lord, You have not created this in vain; glory be to You, protect us from the punishment of the Fire"
+      },
+      "reference": "",
+      "repeat": 1
+    },
+    {
+      "id": 10,
+      "category": "quran",
+      "arabic": "رَبَّنَآ اِنَّكَ مَنْ تُدْخِلِ النَّارَ فَقَدْ اَخْزَيْتَهٗ ۭ وَمَا لِلظّٰلِمِيْنَ مِنْ اَنْصَارٍ",
+      "translations": {
+        "fr": "Seigneur, quiconque Tu plonges dans le Feu, Tu l'as humilié; et les injustes n'ont aucun allié",
+        "en": "Our Lord, whoever You admit to the Fire, indeed You have disgraced them; and the wrongdoers have no helpers"
+      },
+      "reference": "",
+      "repeat": 1
+    },
+    {
+      "id": 11,
+      "category": "quran",
+      "arabic": "رَبَّنَآ اِنَّنَا سَمِعْنَا مُنَادِيًا يُّنَادِيْ لِلْاِيْمَانِ اَنْ اٰمِنُوْا بِرَبِّكُمْ فَاٰمَنَّا ۚ رَبَّنَا فَاغْفِرْ لَنَا ذُنُوْبَنَا وَكَفِّرْ عَنَّا سَيِّاٰتِنَا وَتَوَفَّنَا مَعَ الْاَبْرَارِ",
+      "translations": {
+        "fr": "Seigneur, nous avons entendu un appel invitant à la foi; nous avons cru en notre Seigneur, pardonne nos péchés, efface nos mauvaises actions et fais-nous mourir parmi les justes",
+        "en": "Our Lord, we have heard a caller calling to faith; we have believed in our Lord, forgive us our sins, expiate our misdeeds, and let us die among the righteous"
+      },
+      "reference": "",
+      "repeat": 1
+    },
+    {
+      "id": 12,
+      "category": "quran",
+      "arabic": "رَبَّنَا وَاٰتِنَا مَا وَعَدْتَّنَا عَلٰي رُسُلِكَ وَلَا تُخْزِنَا يَوْمَ الْقِيٰمَةِ ۭاِنَّكَ لَا تُخْلِفُ الْمِيْعَادَ",
+      "translations": {
+        "fr": "Seigneur, accorde-nous ce que Tu as promis par Tes messagers et ne nous humilie pas au Jour de la Résurrection; en vérité, Tu ne manques jamais à Tes promesses",
+        "en": "Our Lord, grant us that which You promised us through Your messengers, and do not disgrace us on the Day of Resurrection; indeed You do not fail in Your promise"
+      },
+      "reference": "",
+      "repeat": 1
+    }
+  ]
+}

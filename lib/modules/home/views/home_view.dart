@@ -81,7 +81,11 @@ class HomeView extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: DT
                               .titleLg(context)
-                              .copyWith(fontSize: 18, height: 1.1, color: DT.txt(context)),
+                              .copyWith(
+                                fontSize: 18,
+                                height: 1.1,
+                                color: DT.txt(context),
+                              ),
                         ),
                         Text(
                           'Prayer Times'.trx,
@@ -97,6 +101,10 @@ class HomeView extends StatelessWidget {
                     builder: (controller) {
                       return Container(
                         margin: const EdgeInsets.only(right: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: DT.glass(context),
                           borderRadius: BorderRadius.circular(10),
@@ -107,7 +115,9 @@ class HomeView extends StatelessWidget {
                             value: controller.currentLang,
 
                             dropdownColor: DT.bg(context),
-                            style: DT.titleMd(context).copyWith(fontSize: 12, letterSpacing: 0.6),
+                            style: DT
+                                .titleMd(context)
+                                .copyWith(fontSize: 12, letterSpacing: 0.6),
                             items: [
                               DropdownMenuItem(
                                 value: 'fr',

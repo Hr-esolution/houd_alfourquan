@@ -92,6 +92,8 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final prayerController = Get.find<PrayerController>();
+    
     return Scaffold(
       backgroundColor: DT.bg(this.context),
       appBar: AppBar(
@@ -118,18 +120,18 @@ class _ErrorState extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.red.withValues(alpha: 0.1),
+                  color: Colors.orange.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  Icons.error_outline,
+                  Icons.location_off,
                   size: 48,
-                  color: Colors.red,
+                  color: Colors.orange,
                 ),
               ),
               const SizedBox(height: 16),
               Text(
-                'Error'.trx,
+                'Position non disponible',
                 style: DT.titleLg(this.context),
               ),
               const SizedBox(height: 8),
@@ -139,14 +141,28 @@ class _ErrorState extends StatelessWidget {
                 style: DT.sub(this.context),
               ),
               const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: onRetry,
-                icon: const Icon(Icons.refresh),
-                label: Text('Refresh'.trx),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: DT.accent(this.context),
-                  foregroundColor: DT.blanc,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: prayerController.selectCityManually,
+                    icon: const Icon(Icons.location_city),
+                    label: const Text('Choisir une ville'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: DT.accent(this.context),
+                      foregroundColor: DT.blanc,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  OutlinedButton.icon(
+                    onPressed: onRetry,
+                    icon: const Icon(Icons.refresh),
+                    label: Text('Réessayer'.trx),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: DT.accent(this.context),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -179,7 +195,14 @@ class _PrayerContent extends StatelessWidget {
             ),
           ),
         ),
-        actions: const [LanguageSwitcher()],
+        actions: [
+          const LanguageSwitcher(),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: controller.refreshLocation,
+            tooltip: 'Actualiser la position',
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -225,6 +248,15 @@ class _PrayerContent extends StatelessWidget {
               ],
             ),
           ),
+          if (controller.isDefaultLocation) ...[
+            IconButton(
+              icon: const Icon(Icons.edit_location, size: 20),
+              onPressed: controller.selectCityManually,
+              tooltip: 'Changer de ville',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+          ],
         ],
       ),
     );

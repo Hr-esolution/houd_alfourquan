@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'controllers/reciter_controller.dart';
 import 'controllers/quran_controller.dart';
+import 'controllers/player_controller.dart';
 import 'views/surah_list_page.dart';
 
 class QuranView extends StatelessWidget {
@@ -28,6 +29,11 @@ class QuranView extends StatelessWidget {
               ),
             ),
           );
+        }
+
+        // Initialize PlayerController after ReciterController is loaded
+        if (!Get.isRegistered<PlayerController>()) {
+          Get.put(PlayerController());
         }
 
         return const SurahListPage();

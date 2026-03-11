@@ -11,9 +11,11 @@ class LanguageSwitcher extends StatelessWidget {
     return GetBuilder<LanguageController>(
       builder: (controller) {
         return PopupMenuButton<String>(
-          icon: Icon(
-            Icons.language,
-            color: DT.dark(context) ? DT.or : DT.noir,
+          icon: Center(
+            child: Icon(
+              Icons.language,
+              color: DT.dark(context) ? DT.or : DT.noir,
+            ),
           ),
           tooltip: 'Language'.trx,
           onSelected: (value) => controller.setLanguage(value),

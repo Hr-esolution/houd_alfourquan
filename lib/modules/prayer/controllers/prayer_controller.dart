@@ -1,28 +1,32 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:adhan_dart/adhan_dart.dart';
 import 'package:geolocator/geolocator.dart' show LocationPermission;
 import '../services/prayer_calculation_service.dart';
-import '../services/location_service.dart';
+import '../../../core/services/location_service.dart';
 import '../models/prayer_time_model.dart';
+import '../services/adhan_notification_service.dart';
+import '../../../core/widgets/city_selection_dialog.dart';
 
 /// Prayer Controller using GetBuilder (NO Obx/Rx)
 ///
 /// Manages prayer times calculation, location, and countdown
 class PrayerController extends GetxController {
   late PrayerCalculationService _calculationService;
-  late LocationService _locationService;
+  final LocationService _locationService = LocationService();
 
   // State variables
   bool _isLoading = false;
   bool _hasError = false;
   String _errorMessage = '';
-  bool _permissionDenied = false;
+  LocationException? _locationException;
 
   // Location
   Coordinates? _coordinates;
-  String _cityName = 'Loading...';
+  String _cityName = 'Chargement...';
   String _selectedMethod = PrayerCalculationService.defaultMethod;
+  bool _isDefaultLocation = false;
 
   // Prayer times
   PrayerTimes? _prayerTimes;
@@ -38,7 +42,7 @@ class PrayerController extends GetxController {
   bool get isLoading => _isLoading;
   bool get hasError => _hasError;
   String get errorMessage => _errorMessage;
-  bool get permissionDenied => _permissionDenied;
+  LocationException? get locationException => _locationException;
   String get cityName => _cityName;
   String get selectedMethod => _selectedMethod;
   PrayerTimes? get prayerTimes => _prayerTimes;
@@ -46,12 +50,13 @@ class PrayerController extends GetxController {
   Prayer? get nextPrayer => _nextPrayer;
   Prayer? get currentPrayer => _currentPrayer;
   Duration get timeUntilNext => _timeUntilNext;
+  bool get isDefaultLocation => _isDefaultLocation;
+  Coordinates? get coordinates => _coordinates;
 
   @override
   void onInit() {
     super.onInit();
     _calculationService = PrayerCalculationService();
-    _locationService = LocationService();
     loadPrayerTimes();
 
     // Update countdown every second
@@ -68,27 +73,27 @@ class PrayerController extends GetxController {
     try {
       _isLoading = true;
       _hasError = false;
-      _permissionDenied = false;
+      _locationException = null;
       update();
 
-      // Get location
-      final coordinates = await _locationService.getLocationWithFallback();
+      // Get location with fallback strategy
+      final result = await _locationService.getLocationWithFallback();
 
-      _coordinates = coordinates;
+      _coordinates = result.coordinates;
+      _cityName = result.cityName;
+      _isDefaultLocation = result.isDefault;
 
-      // Get city name
-      _cityName =
-          await _locationService.getCityName(coordinates) ?? 'Current Location';
+      debugPrint('📍 Location: ${result.cityName} (${result.coordinates.latitude}, ${result.coordinates.longitude})');
 
       // Calculate prayer times
       _prayerTimes = _calculationService.calculate(
         date: _prayerDate,
-        coordinates: coordinates,
+        coordinates: result.coordinates,
         method: _selectedMethod,
       );
 
       if (_prayerTimes == null) {
-        throw Exception('Failed to calculate prayer times');
+        throw Exception('Échec du calcul des horaires de prière');
       }
 
       // Build prayer list
@@ -97,26 +102,39 @@ class PrayerController extends GetxController {
       // Update next prayer
       _updateNextPrayer();
 
+      // Schedule Adhan notifications
+      _scheduleAdhanNotifications();
+
       _isLoading = false;
+
+      // Show warning if using default location
+      if (result.isDefault) {
+        Get.rawSnackbar(
+          message: 'Utilisation de Makkah par défaut. Appuyez pour sélectionner votre ville.',
+          title: 'Position non détectée',
+          snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 5),
+          backgroundColor: Colors.orange,
+          onTap: (_) => selectCityManually(),
+        );
+      }
+
       update();
+    } on LocationException catch (e) {
+      _isLoading = false;
+      _hasError = true;
+      _errorMessage = e.message;
+      _locationException = e;
+      update();
+
+      debugPrint('❌ Location error: ${e.title} - ${e.message}');
     } catch (e) {
       _isLoading = false;
       _hasError = true;
       _errorMessage = e.toString();
-
-      // Check if it's a permission error
-      if (_errorMessage.contains('permission')) {
-        _permissionDenied = true;
-      }
-
       update();
 
-      Get.snackbar(
-        'Error',
-        'Failed to load prayer times: ${e.toString()}',
-        snackPosition: SnackPosition.BOTTOM,
-        duration: const Duration(seconds: 3),
-      );
+      debugPrint('❌ Unexpected error: $e');
     }
   }
 
@@ -174,7 +192,9 @@ class PrayerController extends GetxController {
   void _updateNextPrayer() {
     if (_prayerTimes != null) {
       _nextPrayer = _calculationService.getNextPrayer(_prayerTimes!);
-      _timeUntilNext = _calculationService.getTimeUntilNextPrayer(_prayerTimes!);
+      _timeUntilNext = _calculationService.getTimeUntilNextPrayer(
+        _prayerTimes!,
+      );
       _currentPrayer = _calculationService.getCurrentPrayer(_prayerTimes!);
     }
   }
@@ -195,8 +215,6 @@ class PrayerController extends GetxController {
       _isLoading = true;
       update();
 
-      // Here you would integrate with a geocoding service
-      // For now, just update the name
       _cityName = cityName;
 
       await loadPrayerTimes();
@@ -205,10 +223,38 @@ class PrayerController extends GetxController {
       update();
 
       Get.snackbar(
-        'Error',
-        'City not found: $cityName',
+        'Erreur',
+        'Ville introuvable: $cityName',
         snackPosition: SnackPosition.BOTTOM,
       );
+    }
+  }
+
+  /// Select city manually via dialog
+  Future<void> selectCityManually() async {
+    try {
+      final result = await showCitySelectionDialog(Get.context!);
+
+      if (result != null) {
+        _isLoading = true;
+        update();
+
+        // Set manual location
+        _locationService.setManualLocation(result.coordinates, result.name);
+
+        await loadPrayerTimes();
+
+        Get.snackbar(
+          'Ville mise à jour',
+          '${result.name}, ${result.country}',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ City selection error: $e');
     }
   }
 
@@ -242,7 +288,35 @@ class PrayerController extends GetxController {
   /// Refresh location and recalculate
   Future<void> refreshLocation() async {
     _locationService.clearCache();
+    Get.snackbar(
+      'Actualisation',
+      'Recherche de votre position...',
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 2),
+    );
     await loadPrayerTimes();
+  }
+
+  /// Handle location error and show appropriate action
+  Future<void> handleLocationError() async {
+    if (_locationException == null) return;
+
+    final action = _locationException!.action;
+
+    switch (action) {
+      case LocationAction.openAppSettings:
+        await _locationService.openAppSettings();
+        break;
+      case LocationAction.openSettings:
+        await _locationService.openLocationSettings();
+        break;
+      case LocationAction.manualSelection:
+        await selectCityManually();
+        break;
+      case LocationAction.none:
+        // Just show error
+        break;
+    }
   }
 
   /// Request location permission
@@ -262,5 +336,30 @@ class PrayerController extends GetxController {
   /// Get available calculation methods
   List<String> getAvailableMethods() {
     return PrayerCalculationService.calculationMethods.keys.toList();
+  }
+
+  /// Schedule Adhan notifications for all prayers
+  void _scheduleAdhanNotifications() {
+    if (_prayerTimes == null) return;
+
+    try {
+      final adhanService = Get.find<AdhanNotificationService>();
+
+      // Create prayer times map
+      final prayerTimesMap = <String, DateTime>{
+        'fajr': _prayerTimes!.fajr,
+        'dhuhr': _prayerTimes!.dhuhr,
+        'asr': _prayerTimes!.asr,
+        'maghrib': _prayerTimes!.maghrib,
+        'isha': _prayerTimes!.isha,
+      };
+
+      // Schedule notifications
+      adhanService.rescheduleAllNotifications(prayerTimesMap);
+
+      debugPrint('📅 Adhan notifications scheduled for all prayers');
+    } catch (e) {
+      debugPrint('❌ Error scheduling Adhan notifications: $e');
+    }
   }
 }

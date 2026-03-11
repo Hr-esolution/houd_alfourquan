@@ -36,7 +36,13 @@ class ReciterListPage extends StatelessWidget {
           children: [
             Icon(Icons.person_outline, color: DT.or, size: 18),
             const SizedBox(width: 7),
-            Text('Select Reciter'.trx, style: DT.titleLg(context)),
+            Flexible(
+              child: Text(
+                'Select Reciter'.trx,
+                style: DT.titleLg(context),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         centerTitle: true,

@@ -45,12 +45,12 @@ class MenuCardsWidget extends StatelessWidget {
               crossAxisCount: 2,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              childAspectRatio: 1.55,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              childAspectRatio: 1.8,
               children: [
                 _MenuCard(
-                  title: 'Qibla',
+                  title: 'Qibla'.trx,
                   subtitle: 'Direction'.trx,
                   icon: Icons.explore_rounded,
                   route: Routes.qibla,
@@ -75,6 +75,20 @@ class MenuCardsWidget extends StatelessWidget {
                   subtitle: 'Prayer'.trx,
                   icon: Icons.tune_rounded,
                   route: Routes.settings,
+                  gradient: DT.accentGrad(context),
+                ),
+                _MenuCard(
+                  title: 'Douaa'.trx,
+                  subtitle: 'Supplications'.trx,
+                  icon: Icons.self_improvement_rounded,
+                  route: Routes.douaa,
+                  gradient: DT.accentGrad(context),
+                ),
+                _MenuCard(
+                  title: 'Wird'.trx,
+                  subtitle: 'Daily'.trx,
+                  icon: Icons.auto_stories_rounded,
+                  route: Routes.wirdDaily,
                   gradient: DT.accentGrad(context),
                 ),
               ],
@@ -126,20 +140,20 @@ class _MenuCardState extends State<_MenuCard> {
         curve: Curves.easeOut,
         child: Glass(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             child: Row(
               children: [
                 // Icône dans un carré arrondi avec fond teinté
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: 32,
+                  height: 32,
                   decoration: BoxDecoration(
                     color: widget.gradient.first.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(widget.icon, color: widget.gradient.first, size: 20),
+                  child: Icon(widget.icon, color: widget.gradient.first, size: 16),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 // Textes
                 Expanded(
                   child: Column(
@@ -148,12 +162,16 @@ class _MenuCardState extends State<_MenuCard> {
                     children: [
                       Text(
                         widget.title,
-                        style: DT.titleMd(context),
+                        style: DT.titleMd(context).copyWith(fontSize: 12),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 1),
                       Text(
                         widget.subtitle,
                         style: DT.sub(context),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -161,7 +179,7 @@ class _MenuCardState extends State<_MenuCard> {
                 // Flèche subtile
                 Icon(
                   Icons.chevron_right_rounded,
-                  size: 16,
+                  size: 14,
                   color: widget.gradient.first.withValues(alpha: 0.50),
                 ),
               ],

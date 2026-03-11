@@ -12,4 +12,9 @@ abstract class Routes {
   static const adhanSettings = '/adhan-settings';
   static const privacyPolicy = '/privacy-policy';
   static const termsOfService = '/terms-of-service';
+  
+  // New routes
+  static const douaa = '/douaa';
+  static const wirdDaily = '/wird-daily';
+  static const wirdSettings = '/wird-settings';
 }

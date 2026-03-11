@@ -94,7 +94,7 @@ class SurahListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PlayerController playerController = Get.put(PlayerController());
+    final PlayerController playerController = Get.find<PlayerController>();
     final dark = _C.dark(context);
 
     return Scaffold(
@@ -286,11 +286,14 @@ class SurahListPage extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Now playing',
+                  pc.currentReciterName.isNotEmpty 
+                      ? pc.currentReciterName 
+                      : 'Now playing',
                   style: TextStyle(
                     fontSize: 9,
                     color: _C.or.withValues(alpha: .75),
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

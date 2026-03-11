@@ -5,12 +5,15 @@ import 'package:get/get.dart';
 import 'package:flutter_qiblah/flutter_qiblah.dart';
 import 'package:latlong2/latlong.dart';
 import '../../core/services/location_service.dart';
-import '../../core/services/osm_service.dart';
+import '../../core/widgets/city_selection_dialog.dart';
 
 class QiblaController extends GetxController {
   // Coordonnées de La Mecque
   static const double meccaLat = 21.4225;
   static const double meccaLng = 39.8262;
+
+  // Services
+  final LocationService _locationService = LocationService();
 
   // Localisation
   double userLat = 0.0;
@@ -29,15 +32,15 @@ class QiblaController extends GetxController {
   bool isCompassAvailable = false;
   bool isLoading = true;
   String errorMessage = '';
+  LocationException? _locationException;
+  bool useCompassMode = true; // true = compass, false = diagram
 
   // Recherche de ville
   bool isSearchingCity = false;
-  List<Map<String, dynamic>> searchResults = [];
+  List<CitySearchResult> searchResults = [];
   String searchQuery = '';
 
   StreamSubscription? _qiblahSubscription;
-  final LocationService _locationService = LocationService();
-  final OSMService _osmService = OSMService();
 
   @override
   void onInit() {
@@ -67,23 +70,35 @@ class QiblaController extends GetxController {
 
   Future<void> _loadLocation() async {
     try {
-      final hasPermission = await _locationService.hasPermission();
+      // Get location with fallback strategy
+      final result = await _locationService.getLocationWithFallback();
 
-      if (!hasPermission) {
-        errorMessage = 'Permission de localisation requise';
-        return;
+      userLat = result.coordinates.latitude;
+      userLng = result.coordinates.longitude;
+      cityName = result.cityName;
+
+      debugPrint('📍 Location: $cityName ($userLat, $userLng)');
+
+      // Show warning if using default location
+      if (result.isDefault) {
+        Get.rawSnackbar(
+          message: 'Utilisation de Makkah par défaut. Appuyez pour sélectionner votre ville.',
+          title: 'Position non détectée',
+          snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 5),
+          backgroundColor: Colors.orange,
+          onTap: (_) => selectCityManually(),
+        );
       }
+    } on LocationException catch (e) {
+      debugPrint('❌ Location error: ${e.title} - ${e.message}');
+      _locationException = e;
+      errorMessage = e.message;
 
-      final position = await _locationService.getCurrentLocation();
-      userLat = position.latitude;
-      userLng = position.longitude;
-      cityName = 'Recherche...';
-      update();
-
-      // Search city name from coordinates
-      await _searchCityFromCoords();
-
-      debugPrint('📍 Location: $userLat, $userLng');
+      // Use Paris as fallback for display
+      userLat = 48.8566;
+      userLng = 2.3522;
+      cityName = 'Paris (défaut)';
     } catch (e) {
       debugPrint('❌ Location error: $e');
       errorMessage = 'Position indisponible';
@@ -93,26 +108,9 @@ class QiblaController extends GetxController {
     }
   }
 
-  Future<void> _searchCityFromCoords() async {
-    try {
-      final cityNameData = await _osmService.getCity(userLat, userLng);
-      if (cityNameData.isNotEmpty && cityNameData != 'Unknown') {
-        cityName = cityNameData;
-        debugPrint('🏙️ City: $cityName');
-      } else {
-        cityName = 'Position actuelle';
-      }
-      update();
-    } catch (e) {
-      debugPrint('❌ City search error: $e');
-      cityName = 'Position actuelle';
-      update();
-    }
-  }
-
   // Search city by query
   Future<void> searchCity(String query) async {
-    if (query.length < 3) {
+    if (query.length < 2) {
       searchResults.clear();
       update();
       return;
@@ -123,7 +121,7 @@ class QiblaController extends GetxController {
     update();
 
     try {
-      final results = await _osmService.searchCities(query);
+      final results = await _locationService.searchCities(query);
       searchResults = results;
       debugPrint('🔍 Found ${results.length} cities');
     } catch (e) {
@@ -136,25 +134,38 @@ class QiblaController extends GetxController {
   }
 
   // Select city from search
-  Future<void> selectCity(Map<String, dynamic> result) async {
+  Future<void> selectCity(CitySearchResult result) async {
     try {
-      userLat = double.parse(result['lat']);
-      userLng = double.parse(result['lon']);
-      cityName = result['display_name'].toString().split(',').first.trim();
-      
+      userLat = result.latitude;
+      userLng = result.longitude;
+      cityName = result.name;
+
       _calculateQibla();
       update();
-      
+
       Get.back(); // Close search dialog
-      
+
       Get.snackbar(
         'Ville mise à jour',
-        cityName,
+        '${result.name}, ${result.country}',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.green,
         colorText: Colors.white,
         duration: const Duration(seconds: 2),
       );
+    } catch (e) {
+      debugPrint('❌ City selection error: $e');
+    }
+  }
+
+  /// Select city manually via dialog
+  Future<void> selectCityManually() async {
+    try {
+      final result = await showCitySelectionDialog(Get.context!);
+
+      if (result != null) {
+        await selectCity(result);
+      }
     } catch (e) {
       debugPrint('❌ City selection error: $e');
     }
@@ -265,13 +276,13 @@ class QiblaController extends GetxController {
                               final result = controller.searchResults[index];
                               return ListTile(
                                 leading: Icon(
-                                  Icons.location_on,
+                                  Icons.location_city,
                                   color: Theme.of(context).brightness == Brightness.dark
                                       ? const Color(0xFFC9A84C)
                                       : const Color(0xFF1B5E20),
                                 ),
                                 title: Text(
-                                  result['display_name'] as String,
+                                  result.name,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
@@ -280,6 +291,15 @@ class QiblaController extends GetxController {
                                     color: Theme.of(context).brightness == Brightness.dark
                                         ? Colors.white
                                         : Colors.black87,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  result.country,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Theme.of(context).brightness == Brightness.dark
+                                        ? Colors.white60
+                                        : Colors.black54,
                                   ),
                                 ),
                                 onTap: () => controller.selectCity(result),
@@ -371,6 +391,7 @@ class QiblaController extends GetxController {
   }
 
   void refreshLocation() async {
+    _locationService.clearCache();
     isLoading = true;
     update();
     await _loadLocation();
@@ -379,10 +400,37 @@ class QiblaController extends GetxController {
     update();
   }
 
+  /// Handle location error and show appropriate action
+  Future<void> handleLocationError() async {
+    if (_locationException == null) return;
+
+    final action = _locationException!.action;
+
+    switch (action) {
+      case LocationAction.openAppSettings:
+        await _locationService.openAppSettings();
+        break;
+      case LocationAction.openSettings:
+        await _locationService.openLocationSettings();
+        break;
+      case LocationAction.manualSelection:
+        await selectCityManually();
+        break;
+      case LocationAction.none:
+        // Just show error
+        break;
+    }
+  }
+
   @override
   void onClose() {
     _qiblahSubscription?.cancel();
     super.onClose();
+  }
+
+  void toggleCompassMode() {
+    useCompassMode = !useCompassMode;
+    update();
   }
 
   void detectCurrentAyah() {

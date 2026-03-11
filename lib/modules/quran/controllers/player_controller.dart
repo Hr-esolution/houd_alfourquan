@@ -12,12 +12,16 @@ class PlayerController extends GetxController {
   bool _isPlaying = false;
   double _speed = 1.0;
   bool _isInitialized = false;
+  String _currentReciterName = '';
+  String _currentReciterId = '';
 
   // Getters
   int get currentSurah => _currentSurah;
   bool get isPlaying => _isPlaying;
   double get speed => _speed;
   bool get isInitialized => _isInitialized;
+  String get currentReciterName => _currentReciterName;
+  String get currentReciterId => _currentReciterId;
 
   @override
   void onInit() {
@@ -42,7 +46,42 @@ class PlayerController extends GetxController {
 
   Future<void> playOrStream(int surahNumber) async {
     try {
+      // Wait for reciters to load if needed
+      if (_reciterController.isLoading) {
+        Get.snackbar(
+          'Loading',
+          'Please wait, loading reciters...',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+
+      // Check if reciters list is empty
+      if (_reciterController.reciters.isEmpty) {
+        Get.snackbar(
+          'Error',
+          'No reciters available. Please refresh the app.',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+
       _currentSurah = surahNumber;
+
+      // Store the current reciter info at the time of playing
+      final reciter = _reciterController.selectedReciter;
+      if (reciter == null) {
+        Get.snackbar(
+          'Error',
+          'Please select a reciter first',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+      
+      _currentReciterName = reciter.translatedName;
+      _currentReciterId = reciter.id;
+      
       update();
 
       final isDownloaded = _reciterController.isDownloaded(surahNumber);
@@ -81,38 +120,47 @@ class PlayerController extends GetxController {
 
   Future<void> _streamFromRemote(int surahNumber) async {
     try {
-      final candidates = _reciterController.buildCandidateUrls(surahNumber);
-      if (candidates.isEmpty) {
+      // Use the stored reciter ID to build URLs
+      if (_currentReciterId.isEmpty) {
         Get.snackbar('Error', 'No reciter selected');
         return;
       }
 
-      Object? lastError;
-      for (final url in candidates) {
-        try {
-          debugPrint('📡 Streaming from: $url');
-          await _audioPlayer.setUrl(url);
-          await _audioPlayer.play();
-
-          final reciterId = _reciterController.selectedReciterId;
-          if (reciterId.isNotEmpty) {
-            _reciterController.saveResolvedBaseUrlFromUrl(reciterId, url);
-          }
-
-          Get.snackbar(
-            'Streaming',
-            'Playing Surah $surahNumber from ${_reciterController.selectedReciter?.nameFr}',
-            snackPosition: SnackPosition.BOTTOM,
-            duration: const Duration(seconds: 2),
-          );
-          return;
-        } catch (e) {
-          lastError = e;
-        }
+      // Get all ayah URLs for this surah from alquran.cloud API
+      final ayahUrls = await _reciterController.getAudioUrlsForSurah(surahNumber);
+      if (ayahUrls == null || ayahUrls.isEmpty) {
+        Get.snackbar('Error', 'No audio source available');
+        return;
       }
 
-      debugPrint('❌ Stream error: $lastError');
-      Get.snackbar('Error', 'Failed to stream: ${lastError ?? 'Unknown error'}');
+      try {
+        debugPrint('📡 Streaming surah $surahNumber with ${ayahUrls.length} ayahs');
+
+        // Create a list of audio sources for all ayahs
+        final audioSources = ayahUrls
+            .map((url) => AudioSource.uri(Uri.parse(url)))
+            .toList();
+
+        // ignore: deprecated_member_use
+        await _audioPlayer.setAudioSource(ConcatenatingAudioSource(children: audioSources));
+        await _audioPlayer.play();
+
+        // Use the stored reciter name instead of fetching from selectedReciter
+        Get.snackbar(
+          'Streaming',
+          'Playing Surah $surahNumber from $_currentReciterName',
+          snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 2),
+        );
+      } catch (e) {
+        debugPrint('❌ Stream error: $e');
+        Get.snackbar(
+          'Error',
+          'Audio not available for this reciter. Try another reciter.',
+          snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 3),
+        );
+      }
     } catch (e) {
       debugPrint('❌ Stream error: $e');
       Get.snackbar('Error', 'Failed to stream: ${e.toString()}');

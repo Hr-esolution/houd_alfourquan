@@ -165,11 +165,15 @@ class HomeController extends GetxController {
 
     try {
       debugPrint('=== Début détection GPS ===');
-      
+
       // 1. Get GPS location with timeout
       debugPrint('Demande de position GPS...');
       final position = await locationService.getCurrentLocation();
-      
+
+      if (position == null) {
+        throw Exception('Position GPS non disponible');
+      }
+
       final lat = position.latitude;
       final lng = position.longitude;
       debugPrint('Position obtenue: $lat, $lng');
@@ -227,7 +231,11 @@ class HomeController extends GetxController {
       // Get GPS position with timeout
       debugPrint('Demande de position GPS...');
       final position = await locationService.getCurrentLocation();
-      
+
+      if (position == null) {
+        throw Exception('Position non disponible');
+      }
+
       final lat = position.latitude;
       final lng = position.longitude;
       debugPrint('Position obtenue: $lat, $lng');

@@ -112,17 +112,10 @@ class SurahReadingPage extends StatelessWidget {
                             )
                           // Translation - for French and English
                           else if (controller.translations.isNotEmpty)
-                            Text(
-                              controller.translations
-                                  .map((t) => t['text'] as String)
-                                  .join(' '),
-                              textAlign: TextAlign.left,
-                              textDirection: TextDirection.ltr,
-                              style: TextStyle(
-                                fontSize: 18,
-                                height: 1.5,
-                                color: DT.txt(context),
-                              ),
+                            _buildTranslationWithAyahNumbers(
+                              controller.ayahs,
+                              controller.translations,
+                              context,
                             ),
                           const SizedBox(height: 40),
                           Container(
@@ -180,6 +173,58 @@ class SurahReadingPage extends StatelessWidget {
       }
     }
     return spans;
+  }
+
+  Widget _buildTranslationWithAyahNumbers(
+    List<Map<String, dynamic>> ayahs,
+    List<Map<String, dynamic>> translations,
+    BuildContext context,
+  ) {
+    final spans = <InlineSpan>[];
+    
+    for (int i = 0; i < ayahs.length && i < translations.length; i++) {
+      final ayah = ayahs[i];
+      final translation = translations[i];
+      final text = (translation['text'] as String?) ?? '';
+      final ayahNumber = (ayah['number_in_surah'] as int?) ?? (i + 1);
+      
+      // Add translation text
+      spans.add(
+        TextSpan(
+          text: '$text ',
+          style: TextStyle(
+            fontSize: 18,
+            height: 1.5,
+            color: DT.txt(context),
+          ),
+        ),
+      );
+      
+      // Add ayah number in golden yellow
+      spans.add(
+        TextSpan(
+          text: '($ayahNumber) ',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: DT.or, // Jaune doré
+          ),
+        ),
+      );
+    }
+    
+    return RichText(
+      textAlign: TextAlign.left,
+      textDirection: TextDirection.ltr,
+      text: TextSpan(
+        style: const TextStyle(
+          fontFamily: 'Roboto',
+          fontSize: 18,
+          height: 1.5,
+        ),
+        children: spans,
+      ),
+    );
   }
 }
 

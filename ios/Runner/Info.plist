@@ -51,5 +51,9 @@
 	<string>This app needs access to your location to determine your city and calculate accurate prayer times.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>This app needs access to your location to determine your city and calculate accurate prayer times.</string>
+
+	<!-- Notification Permissions -->
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>This app needs permission to send daily reminders for your Quran reading (Wird).</string>
 </dict>
 </plist>
